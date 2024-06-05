@@ -40,6 +40,7 @@ const AuthenticationPage = ({ pageType }) => {
 
   const handleSignup = (e) => {
     e.preventDefault();
+    console.log("asdf", username, password, email);
     post("/signup/", { username, password, email })
       .then((res) => {
         console.log("success", res);

@@ -15,6 +15,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Clock from "react-clock";
 import "react-clock/dist/Clock.css";
+import { Link } from "react-router-dom";
 
 const EventCRUD = () => {
   const [events, setEvents] = useState([]);
@@ -26,16 +27,22 @@ const EventCRUD = () => {
   const [endTime, setEndTime] = useState("");
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [createAlert, setCreateAlert] = useState(false);
+  const [failAlert, setFailAlert] = useState(false);
 
+  const token = localStorage.getItem("token"); // Retrieve token from localStorage
   const fetchEvents = async () => {
-    get("/events/")
-      .then((res) => {
-        console.log("res", res);
-        setEvents(res); // Assuming the response is an array
-      })
-      .catch((res) => {
-        console.log("error", res);
+    try {
+      const response = await axios.get("http://3.25.70.122:8000/api/events/", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass token in Authorization header
+        },
       });
+
+      console.log("Response:", response.data);
+      setEvents(response.data); // Assuming the response is an array, update state with events
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const createEvent = async () => {
@@ -54,18 +61,24 @@ const EventCRUD = () => {
         setEvents([...events, res]);
         console.log("this is res", res);
         setCreateAlert(true);
+        window.location.reload(false);
         setTimeout(() => setCreateAlert(false), 3000); // Hide alert after 3 seconds
       })
       .catch((error) => {
         console.error("Error creating event:", error);
         console.log("time", formattedStartTime);
         console.log("time", formattedEndTime);
+        setFailAlert(`${error}`);
       });
   };
 
   const deleteEvent = async (id) => {
     try {
-      await axios.delete(`http://3.25.70.122:8000/api/events/${id}`);
+      await axios.delete(`http://3.25.70.122:8000/api/events/${id}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass token in Authorization header
+        },
+      });
       setEvents(events.filter((event) => event.id !== id));
       setShowDeleteAlert(true);
       setTimeout(() => setShowDeleteAlert(false), 3000); // Hide alert after 3 seconds
@@ -80,6 +93,11 @@ const EventCRUD = () => {
 
   return (
     <>
+      {failAlert && (
+        <Alert variant="danger" onClose={() => setFailAlert(false)} dismissible>
+          {failAlert}
+        </Alert>
+      )}
       {showDeleteAlert && (
         <Alert
           variant="danger"
@@ -100,6 +118,10 @@ const EventCRUD = () => {
         </Alert>
       )}
       <Container>
+        <Link to="/">
+          {" "}
+          <Button>Home</Button>
+        </Link>
         <h1 className="my-4">Events</h1>
         <Card className="mb-4">
           <Card.Header>
