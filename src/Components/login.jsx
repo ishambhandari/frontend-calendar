@@ -23,9 +23,10 @@ const AuthenticationPage = ({ pageType }) => {
 
   const navigate = useNavigate();
 
+  const baseURL = "http://localhost:8000/";
   const handleLogin = (e) => {
     e.preventDefault();
-    post("/login/", { username, password })
+    post(`${baseURL}/api/login/`, { username, password })
       .then((response) => {
         console.log("this is res", response);
         localStorage.setItem("token", response.access_token);

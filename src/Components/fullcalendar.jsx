@@ -88,7 +88,7 @@ export default function Calendar() {
     const token = localStorage.getItem("token");
 
     axios
-      .get("http://3.25.70.122:8000/api/events/", {
+      .get("http://localhost:8000/api/events/", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -116,7 +116,7 @@ export default function Calendar() {
   // Check if user is logged in, if not, redirect to login page
 
   return (
-    <>
+    <div style={{ margin: "2rem" }}>
       <Container>
         <CountryPicker countries={countries} getHolidays={getHolidays} />
         <Link to="events/">
@@ -139,6 +139,6 @@ export default function Calendar() {
           views={["dayGridMonth", "dayGridWeek", "dayGridDay"]}
         />
       </div>
-    </>
+    </div>
   );
 }

@@ -15,9 +15,11 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Clock from "react-clock";
 import "react-clock/dist/Clock.css";
-import { Link } from "react-router-dom";
+import TimezonePicker from "./TimezonePicker";
+import { useNavigate, Link } from "react-router-dom";
 
 const EventCRUD = () => {
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -25,63 +27,88 @@ const EventCRUD = () => {
   const [endDate, setEndDate] = useState(new Date());
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  //const [selectedTimezone, setSelectedTimezone] = useState(""); // State for selected timezone
+  const [selectedTimezone, setSelectedTimezone] = useState(
+    Intl.DateTimeFormat().resolvedOptions().timeZone,
+  );
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [createAlert, setCreateAlert] = useState(false);
   const [failAlert, setFailAlert] = useState(false);
 
-  const token = localStorage.getItem("token"); // Retrieve token from localStorage
+  const token = localStorage.getItem("token");
+
   const fetchEvents = async () => {
     try {
-      const response = await axios.get("http://3.25.70.122:8000/api/events/", {
+      const response = await axios.get("http://localhost:8000/api/events/", {
         headers: {
-          Authorization: `Bearer ${token}`, // Pass token in Authorization header
+          Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log("Response:", response.data);
-      setEvents(response.data); // Assuming the response is an array, update state with events
+      setEvents(response.data);
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
   const createEvent = async () => {
-    console.log("startime", startDate);
-    console.log("startime", startTime);
-    const formattedStartTime = `${startDate.toISOString().split("T")[0]}T${startTime}:00`;
-    const formattedEndTime = `${endDate.toISOString().split("T")[0]}T${endTime}:00`;
-    console.log("formattime", formattedStartTime);
-    post("/events/", {
+    const baseURL = "http://localhost:8000/";
+
+    // Format start and end dates with time
+    const formattedStartDateTime = new Date(
+      `${startDate.toISOString().split("T")[0]}T${startTime}:00`,
+    );
+    const formattedEndDateTime = new Date(
+      `${endDate.toISOString().split("T")[0]}T${endTime}:00`,
+    );
+
+    // Convert to UTC strings without milliseconds and without 'Z'
+    const formattedStartUTC = formattedStartDateTime.toISOString().slice(0, -5);
+    const formattedEndUTC = formattedEndDateTime.toISOString().slice(0, -5);
+
+    // Adjust for local timezone offset
+    const timezoneOffset = new Date().getTimezoneOffset();
+    const adjustedStartUTC =
+      new Date(formattedStartUTC).getTime() - timezoneOffset * 60 * 1000;
+    const adjustedEndUTC =
+      new Date(formattedEndUTC).getTime() - timezoneOffset * 60 * 1000;
+
+    // Construct final UTC strings
+    const finalFormattedStartUTC = new Date(adjustedStartUTC)
+      .toISOString()
+      .slice(0, -5);
+    const finalFormattedEndUTC = new Date(adjustedEndUTC)
+      .toISOString()
+      .slice(0, -5);
+
+    console.log("this is data", finalFormattedStartUTC, finalFormattedEndUTC);
+
+    post(`${baseURL}api/events/`, {
       title: title,
       description: description,
-      start_time: formattedStartTime,
-      end_time: formattedEndTime,
+      start_time: finalFormattedStartUTC,
+      end_time: finalFormattedEndUTC,
+      timezone: selectedTimezone, // Include selected timezone in the request payload
     })
       .then((res) => {
         setEvents([...events, res]);
-        console.log("this is res", res);
         setCreateAlert(true);
-        window.location.reload(false);
-        setTimeout(() => setCreateAlert(false), 3000); // Hide alert after 3 seconds
+        setTimeout(() => setCreateAlert(false), 3000);
       })
       .catch((error) => {
         console.error("Error creating event:", error);
-        console.log("time", formattedStartTime);
-        console.log("time", formattedEndTime);
         setFailAlert(`${error}`);
       });
   };
-
   const deleteEvent = async (id) => {
     try {
-      await axios.delete(`http://3.25.70.122:8000/api/events/${id}/`, {
+      await axios.delete(`http://localhost:8000/api/events/${id}/`, {
         headers: {
-          Authorization: `Bearer ${token}`, // Pass token in Authorization header
+          Authorization: `Bearer ${token}`,
         },
       });
       setEvents(events.filter((event) => event.id !== id));
       setShowDeleteAlert(true);
-      setTimeout(() => setShowDeleteAlert(false), 3000); // Hide alert after 3 seconds
+      setTimeout(() => setShowDeleteAlert(false), 3000);
     } catch (error) {
       console.error("Error deleting event:", error);
     }
@@ -89,6 +116,12 @@ const EventCRUD = () => {
 
   useEffect(() => {
     fetchEvents();
+  }, []);
+
+  useEffect(() => {
+    if (localStorage.getItem("token") === null) {
+      navigate("/login/");
+    }
   }, []);
 
   return (
@@ -119,7 +152,6 @@ const EventCRUD = () => {
       )}
       <Container>
         <Link to="/">
-          {" "}
           <Button>Home</Button>
         </Link>
         <h1 className="my-4">Events</h1>
@@ -191,6 +223,10 @@ const EventCRUD = () => {
                   </Form.Group>
                 </Col>
               </Row>
+              {/* Add TimezonePicker component */}
+              <TimezonePicker
+                onSelect={(timezone) => setSelectedTimezone(timezone)}
+              />
               <Button variant="primary" onClick={createEvent}>
                 Create
               </Button>
@@ -203,17 +239,17 @@ const EventCRUD = () => {
           </Card.Header>
           <Card.Body>
             <ListGroup>
-              {console.log("events", events)}
               {events.length > 0 ? (
                 events.map((event) => (
                   <ListGroup.Item key={event.id} className="mb-3">
                     <div className="fw-bold">{event.title}</div>
                     <div>{event.description}</div>
                     <div>
-                      Start Time: {new Date(event.start_time).toLocaleString()}
+                      Start Time: {new Date(event.start_time).toLocaleString()}{" "}
+                      UTC
                     </div>
                     <div>
-                      End Time: {new Date(event.end_time).toLocaleString()}
+                      End Time: {new Date(event.end_time).toLocaleString()} UTC
                     </div>
                     <Button
                       variant="danger"
