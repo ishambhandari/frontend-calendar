@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import levologo from "../assets/levo_logo.jpeg";
 import axios from "axios";
 import { get, del, post } from "../utils/api";
+import { InfinitySpin } from "react-loader-spinner";
 import {
   Card,
   Row,
@@ -30,6 +31,7 @@ const EventCRUD = () => {
   const [endDate, setEndDate] = useState(new Date());
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [loading, setLoading] = useState(false);
   //const [selectedTimezone, setSelectedTimezone] = useState(""); // State for selected timezone
   const [selectedTimezone, setSelectedTimezone] = useState(
     Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -81,6 +83,7 @@ const EventCRUD = () => {
       .slice(0, -5);
 
     console.log("this is data", finalFormattedStartUTC, finalFormattedEndUTC);
+    setLoading(true);
 
     post(`${baseURL}api/events/`, {
       title: title,
@@ -93,10 +96,12 @@ const EventCRUD = () => {
         setEvents([...events, res]);
         setCreateAlert(true);
         setTimeout(() => setCreateAlert(false), 3000);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error creating event:", error);
         setFailAlert(`${error.response.data.error}`);
+        setLoading(false);
       });
   };
   const deleteEvent = async (id) => {
@@ -123,6 +128,26 @@ const EventCRUD = () => {
       navigate("/login/");
     }
   }, []);
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <InfinitySpin
+          visible={true}
+          width="200"
+          color="#87CEEB"
+          ariaLabel="infinity-spin-loading"
+        />
+      </div>
+    );
+  }
 
   return (
     <>

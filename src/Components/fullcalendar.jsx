@@ -28,24 +28,6 @@ export default function Calendar() {
     localStorage.removeItem("token");
   };
 
-  const handleSelect = (info) => {
-    const { start, end } = info;
-    setSelectedDate(start); // Update selected date state
-
-    const eventNamePrompt = prompt("Enter event name");
-    if (eventNamePrompt) {
-      setEvents([
-        ...events,
-        {
-          start,
-          end,
-          title: eventNamePrompt,
-          id: uuid(),
-        },
-      ]);
-    }
-  };
-
   const getCountries = () => {
     axios({
       method: "get",
@@ -103,6 +85,7 @@ export default function Calendar() {
       .then((response) => {
         console.log("Response:", response.data);
         const eventsData = response.data; // Assuming the response is an array of events
+        setEvents(response.data);
 
         // Map over the events data to create the newEvents array
         const newEventsData = eventsData.map((event) => ({
@@ -136,7 +119,6 @@ export default function Calendar() {
             initialDate={initialDate} // Set initial date
             initialView="dayGridMonth" // Set initial view to month view
             events={[...newEvents, ...holiday]}
-            select={handleSelect}
             headerToolbar={{
               start: "today prev next",
               center: "title", // Display the selected date in the toolbar
@@ -156,10 +138,10 @@ export default function Calendar() {
               </Button>{" "}
             </Link>
             <Link to="events/">
-              <Button style={{ marginTop: "10px" }}>Create Event</Button>{" "}
+              <Button style={{ marginTop: "10px" }}>Create/View Event</Button>{" "}
             </Link>
           </div>
-          <Holidayview events={newEvents} holiday={holiday} />
+          <Holidayview events={events} holiday={holiday} />
         </div>
       </div>
     </div>
