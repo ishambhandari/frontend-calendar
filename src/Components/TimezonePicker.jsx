@@ -40,9 +40,6 @@ const TimezonePicker = ({ onSelect }) => {
           </option>
         ))}
       </select>
-      {selectedTimezone && (
-        <p>UTC Equivalent: {convertToUTC(selectedTimezone)}</p>
-      )}
     </div>
   );
 };

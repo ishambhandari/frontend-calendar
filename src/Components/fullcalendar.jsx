@@ -4,11 +4,13 @@ import { redirect } from "react-router-dom"; // Import Redirect
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { Container, Button, Row } from "react-bootstrap";
+import { Container, Button, Row, Col } from "react-bootstrap";
 import "./styles.css";
 import axios from "axios";
+import levologo from "../assets/levo_logo.jpeg";
 import CountryPicker from "./CountryPicker";
 import { useNavigate, Link } from "react-router-dom";
+import Holidayview from "./Holidayview";
 
 export default function Calendar() {
   const get_countries_url =
@@ -21,6 +23,10 @@ export default function Calendar() {
   const [initialDate, setInitialDate] = useState(new Date()); // Set initial date to today
   const [selectedDate, setSelectedDate] = useState(null); // State to store selected date
   const [newEvents, setNewEvents] = useState([]);
+
+  const logout = () => {
+    localStorage.removeItem("token");
+  };
 
   const handleSelect = (info) => {
     const { start, end } = info;
@@ -63,6 +69,7 @@ export default function Calendar() {
 
     setHoliday(holidayEvents);
   };
+
   useEffect(() => {
     if (localStorage.getItem("token") === null) {
       navigate("/login/");
@@ -116,28 +123,44 @@ export default function Calendar() {
   // Check if user is logged in, if not, redirect to login page
 
   return (
-    <div style={{ margin: "2rem" }}>
-      <Container>
-        <CountryPicker countries={countries} getHolidays={getHolidays} />
-        <Link to="events/">
-          {" "}
-          <Button style={{ marginTop: "10px" }}>View/Update Event</Button>{" "}
-        </Link>
-      </Container>
+    <div>
+      <div style={{ textAlign: "center", height: "40px" }}>
+        <img src={levologo} className="img-fluid" alt="Sample image" />
+      </div>
       <div className="calendar-container">
-        <FullCalendar
-          initialDate={initialDate} // Set initial date
-          initialView="dayGridMonth" // Set initial view to month view
-          events={[...newEvents, ...holiday]}
-          select={handleSelect}
-          headerToolbar={{
-            start: "today prev next",
-            center: "title", // Display the selected date in the toolbar
-            end: "dayGridMonth dayGridWeek dayGridDay",
-          }}
-          plugins={[dayGridPlugin, interactionPlugin]}
-          views={["dayGridMonth", "dayGridWeek", "dayGridDay"]}
-        />
+        <div className="left-div">
+          <Container>
+            <CountryPicker countries={countries} getHolidays={getHolidays} />
+          </Container>
+          <FullCalendar
+            initialDate={initialDate} // Set initial date
+            initialView="dayGridMonth" // Set initial view to month view
+            events={[...newEvents, ...holiday]}
+            select={handleSelect}
+            headerToolbar={{
+              start: "today prev next",
+              center: "title", // Display the selected date in the toolbar
+              end: "dayGridMonth dayGridWeek dayGridDay",
+            }}
+            plugins={[dayGridPlugin, interactionPlugin]}
+            views={["dayGridMonth", "dayGridWeek", "dayGridDay"]}
+          />
+        </div>
+        <div className="right-div">
+          <div
+            style={{ padding: "20px", marginTop: "2rem", textAlign: "right" }}
+          >
+            <Link to="login/">
+              <Button style={{ marginTop: "10px" }} onClick={logout}>
+                Logout
+              </Button>{" "}
+            </Link>
+            <Link to="events/">
+              <Button style={{ marginTop: "10px" }}>Create Event</Button>{" "}
+            </Link>
+          </div>
+          <Holidayview events={newEvents} holiday={holiday} />
+        </div>
       </div>
     </div>
   );

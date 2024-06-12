@@ -34,7 +34,7 @@ const CountryPicker = ({ countries, getHolidays }) => {
   };
 
   return (
-    <div>
+    <div style={{ width: "30%", padding: "20px" }}>
       <h3>Select a country:</h3>
       <Form.Select
         value={selectedCountry}

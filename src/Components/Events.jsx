@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import levologo from "../assets/levo_logo.jpeg";
 import axios from "axios";
 import { get, del, post } from "../utils/api";
 import {
@@ -17,6 +18,8 @@ import Clock from "react-clock";
 import "react-clock/dist/Clock.css";
 import TimezonePicker from "./TimezonePicker";
 import { useNavigate, Link } from "react-router-dom";
+import ErrorToast from "./ErrorToast";
+import SuccessToast from "./SuccessToast";
 
 const EventCRUD = () => {
   const navigate = useNavigate();
@@ -61,18 +64,15 @@ const EventCRUD = () => {
       `${endDate.toISOString().split("T")[0]}T${endTime}:00`,
     );
 
-    // Convert to UTC strings without milliseconds and without 'Z'
     const formattedStartUTC = formattedStartDateTime.toISOString().slice(0, -5);
     const formattedEndUTC = formattedEndDateTime.toISOString().slice(0, -5);
 
-    // Adjust for local timezone offset
     const timezoneOffset = new Date().getTimezoneOffset();
     const adjustedStartUTC =
       new Date(formattedStartUTC).getTime() - timezoneOffset * 60 * 1000;
     const adjustedEndUTC =
       new Date(formattedEndUTC).getTime() - timezoneOffset * 60 * 1000;
 
-    // Construct final UTC strings
     const finalFormattedStartUTC = new Date(adjustedStartUTC)
       .toISOString()
       .slice(0, -5);
@@ -96,7 +96,7 @@ const EventCRUD = () => {
       })
       .catch((error) => {
         console.error("Error creating event:", error);
-        setFailAlert(`${error}`);
+        setFailAlert(`${error.response.data.error}`);
       });
   };
   const deleteEvent = async (id) => {
@@ -126,34 +126,21 @@ const EventCRUD = () => {
 
   return (
     <>
-      {failAlert && (
-        <Alert variant="danger" onClose={() => setFailAlert(false)} dismissible>
-          {failAlert}
-        </Alert>
-      )}
-      {showDeleteAlert && (
-        <Alert
-          variant="danger"
-          onClose={() => setShowDeleteAlert(false)}
-          dismissible
-        >
-          Event Deleted
-        </Alert>
-      )}
+      {failAlert && <ErrorToast error={failAlert} />}
+      {showDeleteAlert && <SuccessToast sucess="Event deleted!" />}
 
-      {createAlert && (
-        <Alert
-          variant="success"
-          onClose={() => setCreateAlert(false)}
-          dismissible
-        >
-          Event Created
-        </Alert>
-      )}
+      {createAlert && <SuccessToast success="Event Created" />}
+
+      <div style={{ textAlign: "center", height: "40px" }}>
+        <img src={levologo} className="img-fluid" alt="Sample image" />
+      </div>
+
       <Container>
-        <Link to="/">
-          <Button>Home</Button>
-        </Link>
+        <div style={{ textAlign: "right" }}>
+          <Link to="/">
+            <Button>Home</Button>
+          </Link>
+        </div>
         <h1 className="my-4">Events</h1>
         <Card className="mb-4">
           <Card.Header>

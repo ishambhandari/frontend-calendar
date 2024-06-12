@@ -2,16 +2,12 @@
 
 .calendar-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
   padding: 20px;
-  margin-top: 2rem;
-  background-color: #f8f9fa;
 }
 
 .fc {
-  max-width: 900px;
-  width: 100%;
+  /* max-width: 900px; */
+  /* width: 100%; */
   background: white;
   border: 1px solid #ddd;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -19,11 +15,12 @@
 }
 
 .fc-toolbar {
-  background-color: #007bff;
+  background-color: #87CEEB;
   color: white;
   border-bottom: 1px solid #ddd;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
+  padding:10px
 }
 
 .fc-toolbar-title {
@@ -64,3 +61,36 @@
   padding: 0.5rem;
   border-radius: 4px;
 }
+.alertContainer: {
+    position: 'fixed';
+    top: 0;
+    left: 0;
+    right: 0;
+    zIndex: 9999; // Adjust z-index as needed to ensure it appears above other content
+    width: '100%';
+} 
+
+.left-div {
+  flex: 0 0 70%; /* Take up 80% of the container width */
+  padding: 20px;
+}
+
+.right-div {
+  flex: 1; /* Take up remaining space */
+  padding: 20px;
+}
+.event-row {
+  padding: 10px 0; /* Add padding to the row */
+}
+
+.event-details {
+  padding: 10px; /* Add padding to the event details column */
+}
+
+.delete-button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+
