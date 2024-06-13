@@ -77,7 +77,7 @@ export default function Calendar() {
     const token = localStorage.getItem("token");
 
     axios
-      .get("http://localhost:8000/api/events/", {
+      .get("http://3.25.70.122:8000/api/events/", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

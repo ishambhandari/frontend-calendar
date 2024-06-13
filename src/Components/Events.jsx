@@ -44,7 +44,7 @@ const EventCRUD = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/events/", {
+      const response = await axios.get("http://3.25.70.122:8000/api/events/", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -56,7 +56,7 @@ const EventCRUD = () => {
   };
 
   const createEvent = async () => {
-    const baseURL = "http://localhost:8000/";
+    const baseURL = "http://3.25.70.122:8000/";
 
     // Format start and end dates with time
     const formattedStartDateTime = new Date(
@@ -106,7 +106,7 @@ const EventCRUD = () => {
   };
   const deleteEvent = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/events/${id}/`, {
+      await axios.delete(`http://3.25.70.122:8000/api/events/${id}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

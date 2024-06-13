@@ -5,7 +5,7 @@ const api = axios.create({
   //baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api",
   // baseURL: "http://3.25.70.122:8000/api",
 
-  baseURL: "http://localhost:8000/",
+  baseURL: "http://3.25.70.122:8000/",
 
   headers: {
     "Content-Type": "application/json",

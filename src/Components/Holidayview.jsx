@@ -29,7 +29,7 @@ export default function Holidayview(events, holiday) {
   const deleteEvent = (id) => {
     setLoading(true);
     axios
-      .delete(`http://localhost:8000/api/events/${id}/`, {
+      .delete(`http://3.25.70.122:8000/api/events/${id}/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

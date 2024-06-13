@@ -27,7 +27,7 @@ const AuthenticationPage = ({ pageType }) => {
 
   const navigate = useNavigate();
 
-  const baseURL = "http://localhost:8000/";
+  const baseURL = "http://3.25.70.122:8000/";
   const handleLogin = (e) => {
     e.preventDefault();
     setLoading(true);
