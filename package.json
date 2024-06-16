@@ -8,9 +8,11 @@
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "start": "vite preview"
+    "start": "vite preview",
+    "postinstall": "npm install vite@latest --save-dev"
   },
   "dependencies": {
+    "vite": ""
     "@fullcalendar/bootstrap": "^6.1.13",
     "@fullcalendar/core": "^6.1.13",
     "@fullcalendar/daygrid": "^6.1.13",
