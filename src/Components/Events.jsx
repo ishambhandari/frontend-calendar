@@ -99,8 +99,8 @@ const EventCRUD = () => {
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Error creating event:", error);
-        setFailAlert(`${error.response.data.error}`);
+        console.error("Error creating event:", error.response.data);
+        setFailAlert(`${JSON.stringify(error.response.data)}`);
         setLoading(false);
       });
   };
